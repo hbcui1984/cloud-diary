@@ -1,10 +1,14 @@
-
 <template>
   <view class="uni-container">
     <uni-forms ref="form" v-model="formData" validate-trigger="submit" err-show-type="toast" @submit="submit">
-      <uni-forms-item name="content" label="">
-  <textarea @input="binddata('content', $event.detail.value)" class="uni-textarea-border" :value="formData.content"></textarea>
-</uni-forms-item>
+      <uni-forms-item label="时间">
+        <picker mode="date">
+          <view>{{formData.diary_date}}</view>
+        </picker>
+      </uni-forms-item>
+      <uni-forms-item name="content" label="内容">
+        <textarea @input="binddata('content', $event.detail.value)" class="uni-textarea-border" :value="formData.content"></textarea>
+      </uni-forms-item>
 
       <view class="uni-button-group">
         <button type="primary" class="uni-button" @click="submitForm">提交</button>
@@ -32,14 +36,17 @@
 
   export default {
     data() {
+      const currentDate = this.getDate({
+        format: true
+      })
       return {
         formOptions: {},
         formData: {
-  "diary_date": null,
-  "content": ""
-},
+          "diary_date": currentDate,
+          "content": ""
+        },
         rules: {
-          ...getValidator(["diary_date","content"])
+          ...getValidator(["diary_date", "content"])
         }
       }
     },
@@ -86,6 +93,21 @@
         }).finally(() => {
           uni.hideLoading()
         })
+      },
+      getDate(type) {
+        const date = new Date();
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+
+        if (type === 'start') {
+          year = year - 60;
+        } else if (type === 'end') {
+          year = year + 2;
+        }
+        month = month > 9 ? month : '0' + month;;
+        day = day > 9 ? day : '0' + day;
+        return `${year}-${month}-${day}`;
       }
     }
   }
@@ -132,4 +154,3 @@
     margin: 0;
   }
 </style>
-
